@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Search, FlaskConical, Bot, Activity, BookOpen } from 'lucide-react'
+import { Search, FlaskConical, Bot, Activity, BookOpen, Sparkles } from 'lucide-react'
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL || ''
 
@@ -110,16 +110,17 @@ function Chatbot() {
   async function ask() {
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) })
+      // Prefer universal /api/ask so the database can answer like ChatGPT using stored knowledge
+      const res = await fetch(`${API_BASE}/api/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: msg }) })
       const data = await res.json()
-      setReply(data.reply || 'No reply')
+      setReply(data.answer || data.reply || 'No reply')
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
   }
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
-      <Section title="Pharmacology chatbot" subtitle="Answers with AI (if configured)" icon={Bot} />
+      <Section title="Ask anything" subtitle="Answers from your database + AI (if configured)" icon={Bot} />
       <div className="flex gap-2">
         <input value={msg} onChange={e=>setMsg(e.target.value)} className="flex-1 border rounded-lg px-3 py-2" />
         <button onClick={ask} className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-60" disabled={loading}>{loading? 'Asking...' : 'Ask'}</button>
@@ -222,7 +223,7 @@ export default function App() {
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">Pharmacy Learning Toolkit</h1>
-          <p className="text-gray-600 mt-1">Search drugs, simulate interactions, chat with AI, generate quizzes, and summarize research.</p>
+          <p className="text-gray-600 mt-1">Search drugs, simulate interactions, ask anything, generate quizzes, and summarize research.</p>
         </div>
         <SeedDataButton />
         <div className="grid md:grid-cols-2 gap-6">
